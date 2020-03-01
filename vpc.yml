@@ -11,3 +11,13 @@ Resources:
       Tags:
         - Key: Name
           Value:  !Join ['', [!Ref "AWS::StackName", "-VPC" ]]
+  # Create IGW for VPC:
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    DependsOn: VPC
+  # Attach IGW:
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway

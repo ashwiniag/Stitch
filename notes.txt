@@ -10,8 +10,14 @@ AWS::StackName: stack name. todo: importance??
 
 
 CLI:
-aws cloudformation create-stack --stack-name <name>> --template-body file://./<filename>.yml --profile <>
+> aws cloudformation create-stack --stack-name <name>> --template-body file://./<filename>.yml --profile <>
+> aws cloudformation wait stack-create-complete --stack-name <> todo:??
+> aws cloudformation update-stack --stack-name <name> --template-body file://<name>>.yml
+To update stack
+> aws cloudformation wait stack-update-complete --stack-name <name>
+To monitor progress
+> aws cloudformation delete-stack --stack-name <name>
+To delete
 
-aws cloudformation wait stack-create-complete --stack-name <> todo:??
 #gotchas
 - any errors encountered while creating stack, entire resource creation will be rolled back.
