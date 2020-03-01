@@ -1,0 +1,8 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Create S3 bucket. Understand working.
+Resources:
+  HelloBucketgaddagi:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
