@@ -1,41 +1,24 @@
 # Creat a security group for load balancer @ port
 AWSTemplateFormatVersion: 2010-09-09
-Description: Setting up Security group for ALB and ECS instances running in private subnets
+Description: Setting up Security group for public ALB
 Resources:
   PublicALB:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription:  !Join ['-', [!Ref "AWS::StackName"]]
-      VpcId:
-        Fn::ImportValue:
-          VPC-ID
+      VpcId: !ImportValue VPC-ID
       SecurityGroupIngress:
-        - IpProtocol: HTTPS
+        - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
-#      Tags:
-#        - Key: Name
-#          Value:  !Join ['-', [!Ref "AWS::StackName", "ALB" ]]
-#  PrivateECS:
-#    Type: AWS::EC2::SecurityGroup
-#    Properties:
-#      GroupDescription:  !Join ['-', [!Ref "AWS::StackName"]]
-#      VpcId: !ImportValue VPC-ID
-#      SecurityGroupIngress:
-#        - IpProtocol: -1
-#          SourceSecurityGroupId: !Ref PublicALB
-#      Tags:
-#        - Key: Name
-#          Value:  !Join ['-', [!Ref "AWS::StackName", "ECS" ]]
-#Outputs:
-#  PublicALB:
-#    Description: A reference to the security group for load balancers
-#    Value: !Ref PublicALB
-#    Export:
-#      Name: Public-ALB-SG-ID
-#  PrivateECS:
-#    Description: A reference to the security group for private containers
-#    Value: !Ref PrivateECS
-#    Export:
-#      Name: Private-ECS-SG-ID
+      Tags:
+        - Key: Name
+          Value:  !Join ['-', [!Ref "AWS::StackName", "ALB" ]]
+
+Outputs:
+  PublicALB:
+    Description: A reference to the security group for load balancers
+    Value: !Ref PublicALB
+    Export:
+      Name: Public-ALB-SG-ID
