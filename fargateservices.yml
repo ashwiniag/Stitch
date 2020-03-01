@@ -1,0 +1,69 @@
+#tg,sg,ecs
+AWSTemplateFormatVersion: 2010-09-09
+Description:  services running in fargate.
+Parameters:
+  serviceName:
+    Type: String
+    Default: Stitch
+  servicePort:
+    Type: Number
+    Default: 4848
+  ImageURI:
+    Type: String
+Resources:
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Join ['-', [!Ref "AWS::StackName",!Ref serviceName]]
+  # Create Access Role for ECS-Tasks
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:  !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'ExecutionRole']]
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+  # Create a TaskDefinition with container details
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Memory: 1024
+      Cpu: 512
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - 'FARGATE'
+      TaskRoleArn: !Ref ExecutionRole
+      ExecutionRoleArn: !Ref ExecutionRole
+      ContainerDefinitions:
+        - Name:  !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'Container']]
+          Image: !Ref ImageURI
+          PortMappings:
+            - ContainerPort: !Ref servicePort
+              HostPort: !Ref servicePort
+  # Create an ECS Service
+  ECSService:
+    Type: AWS::ECS::Service
+    DependsOn: LoadBalancer
+    Properties:
+      ServiceName:  !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'ECSService']]
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TaskDefinition
+      DesiredCount: 2
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !ImportValue PublicSubnetA
+            - !ImportValue PublicSubnetB
+          SecurityGroups:
+            - !Ref ContainerSecurityGroup
+      LoadBalancers:
+        - ContainerName: !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'Container']]
+          ContainerPort: !Ref servicePort
+          TargetGroupArn: !Ref TargetGroup
