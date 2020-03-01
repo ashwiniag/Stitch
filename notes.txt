@@ -1,0 +1,17 @@
+Identation is important while writing in yml file
+subnet calculation: http://www.davidc.net/sites/default/subnets/subnets.html?network=10.0.0.0&mask=19&division=1.0
+
+!Join ['', [!Ref "AWS::StackName", "-VPC" ]]
+!Join: glueing text strings.
+first '' identifies words to be glued.
+!Ref: references something defined somewhere in template
+AWS::StackName: stack name. todo: importance??
+-VPC: suffix name for vpc. SO it will start something with "stackname-VPC"
+
+
+CLI:
+aws cloudformation create-stack --stack-name <name>> --template-body file://./<filename>.yml --profile <>
+
+aws cloudformation wait stack-create-complete --stack-name <> todo:??
+#gotchas
+- any errors encountered while creating stack, entire resource creation will be rolled back.
