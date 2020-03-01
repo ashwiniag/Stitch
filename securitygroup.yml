@@ -1,0 +1,30 @@
+# Creat a security group for load balancer @ port
+AWSTemplateFormatVersion: 2010-09-09
+Description: Setting up Security group for ALB and ECS instances running in private subnets
+Resources:
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription:  !Join ['-', [!Ref "AWS::StackName", "ALB"]]
+      VpcId: !ImportValue VPC-ID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value:  !Join ['-', [!Ref "AWS::StackName", "ALB" ]]
+  ContainerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Join ['-', [!Ref "AWS::StackName", "ECS"]]
+      VpcId: !ImportValue VPC-ID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 4848
+          ToPort: 4848
+          SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+      Tags:
+        - Key: Name
+          Value:  !Join ['-', [!Ref "AWS::StackName", "ECS" ]]
