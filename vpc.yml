@@ -5,7 +5,7 @@ Resources:
   VPC:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: 10.1.0.0/16
+      CidrBlock: 172.10.0.0/16
       EnableDnsSupport: true
       EnableDnsHostnames: true
       Tags:
@@ -22,11 +22,11 @@ Resources:
       VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
   # Public Subnets AZ- a and b respectively
-  PublicSubnetA: #localscope A for AZ-a
+  PublicSubnetA: #localscope A for AZ-ap-south-1a
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.1.10.0/24
+      CidrBlock: 172.10.1.0/24
       AvailabilityZone: !Select [ 0, !GetAZs ]
       Tags:
         - Key: Name
@@ -35,7 +35,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.1.20.0/24
+      CidrBlock: 172.10.2.0/24
       AvailabilityZone: !Select [ 1, !GetAZs ]
       Tags:
         - Key: Name
@@ -45,7 +45,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.1.50.0/24
+      CidrBlock: 172.10.3.0/24
       AvailabilityZone: !Select [ 0, !GetAZs ]
       Tags:
         - Key: Name
@@ -54,7 +54,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.1.60.0/24
+      CidrBlock: 172.10.4.0/24
       AvailabilityZone: !Select [ 1, !GetAZs ]
       Tags:
         - Key: Name
@@ -125,3 +125,45 @@ Resources:
     Properties:
       SubnetId: !Ref PrivateSubnetB
       RouteTableId: !Ref PrivateRouteTable
+
+Outputs:
+  VPC:
+    Description: VPC of the base network
+    Value: !Ref VPC
+    Export:
+       Name: !Sub ${AWS::StackName}-VPC
+  PublicSubnetA:
+    Description: First Public Subnet
+    Value: !Ref PublicSubnetA
+    Export:
+      Name: !Sub ${AWS::StackName}-PublicSubnetA
+  PublicSubnetB:
+    Description: Second Public Subnet
+    Condition: BuildPublicB
+    Value: !Ref PublicSubnetB
+    Export:
+      Name: !Sub ${AWS::StackName}-PublicSubnetB
+  PublicSubnetC:
+    Description: Third Public Subnet
+    Condition: BildPublicC
+    Value: !Ref PublicSubnetC
+    Export:
+      Name: !Sub ${AWS::StackName}-PublicSubnetC
+  PrivateSubnetA:
+    Condition: BuildPrivateSubnets
+    Description: First Private Subnet
+    Value: !Ref PrivateSubnetA
+    Export:
+      Name: !Sub ${AWS::StackName}-PrivateSubnetA
+  PrivateSubnetB:
+    Condition: BuildPrivateB
+    Description: Second Private Subnet
+    Value: !Ref PrivateSubnetB
+    Export:
+      Name: !Sub ${AWS::StackName}-PrivateSubnetB
+  PrivateSubnetC:
+    Condition: BuildPrivateC
+    Description: Third Private Subnet
+    Value: !Ref PrivateSubnetC
+    Export:
+      Name: !Sub ${AWS::StackName}-PrivateSubnetC
