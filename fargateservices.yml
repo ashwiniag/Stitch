@@ -10,6 +10,7 @@ Parameters:
     Default: 4848
   ImageURI:
     Type: String
+    Default: 575551386784.dkr.ecr.ap-south-1.amazonaws.com/hellostitch:latest
 
 Resources:
   #Create Targate group for respective service
@@ -36,7 +37,7 @@ Resources:
       DefaultActions:
         - TargetGroupArn: !Ref TargetGroup
           Type: forward
-      LoadBalancerArn: !Ref Public-ALB-ID
+      LoadBalancerArn: !ImportValue Public-ALB-ID
       Conditions:
         - Field: path-pattern
           Values:
@@ -92,7 +93,7 @@ Resources:
   # Create an ECS Service
   ECSService:
     Type: AWS::ECS::Service
-    DependsOn: !ImportValue Public-ALB-ID
+    DependsOn: LoadBalancerListener
     Properties:
       ServiceName:  !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'ECSService']]
       Cluster: !Ref Cluster
@@ -106,7 +107,7 @@ Resources:
             - !ImportValue PublicSubnetA
             - !ImportValue PublicSubnetB
           SecurityGroups:
-            - !Ref ContainerSecurityGroup
+            - !Ref PrivateECS
       LoadBalancers:
         - ContainerName: !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'Container']]
           ContainerPort: !Ref servicePort
@@ -118,3 +119,8 @@ Outputs:
     Value: !Ref PrivateECS
     Export:
       Name: Private-ECS-SG-ID
+  TargetGroup:
+    Description: A reference to the Target group for private containers
+    Value: !Ref TargetGroup
+    Export:
+      Name: TG-ID
