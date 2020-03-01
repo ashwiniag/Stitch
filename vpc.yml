@@ -131,24 +131,24 @@ Outputs:
     Description: VPC of the base network
     Value: !Ref VPC
     Export:
-       Name: !Sub ${AWS::StackName}-VPC
+       Name: VPC-ID
   PublicSubnetA:
     Description: First Public Subnet
     Value: !Ref PublicSubnetA
     Export:
-      Name: !Sub ${AWS::StackName}-PublicSubnetA
+      Name: PublicSubnetA
   PublicSubnetB:
     Description: Second Public Subnet
     Value: !Ref PublicSubnetB
     Export:
-      Name: !Sub ${AWS::StackName}-PublicSubnetB
+      Name: PublicSubnetB
   PrivateSubnetA:
     Description: First Private Subnet
     Value: !Ref PrivateSubnetA
     Export:
-      Name: !Sub ${AWS::StackName}-PrivateSubnetA
+      Name: PrivateSubnetA
   PrivateSubnetB:
     Description: Second Private Subnet
     Value: !Ref PrivateSubnetB
     Export:
-      Name: !Sub ${AWS::StackName}-PrivateSubnetB
+      Name: PrivateSubnetB
