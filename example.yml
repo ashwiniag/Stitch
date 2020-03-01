@@ -6,3 +6,10 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: PublicRead
+
+Outputs:
+  HelloBucketgaddagi:
+    Description: Information about the value
+    Value: Value to return
+    Export:
+      Name: Value to export
