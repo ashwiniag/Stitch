@@ -10,7 +10,51 @@ Parameters:
     Default: 4848
   ImageURI:
     Type: String
+
 Resources:
+  #Create Targate group for respective service
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'TG']]
+      Port: 4848
+      Protocol: HTTP
+      TargetType: ip
+      VpcId: !ImportValue VPC-ID
+      HealthCheckIntervalSeconds: 30 #default
+      HealthCheckPath: '/'
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 5
+      UnhealthyThresholdCount: 2
+      Matcher:
+        HttpCode: 200
+  # Create a LoadBalancerListener and attach the TargetGroup and LoadBalancer
+  LoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref TargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref Public-ALB-ID
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - "/"
+      Port: 443
+      Protocol: HTTP
+  #Create SG for respective fargate service containers
+  PrivateECS:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription:  !Join ['-', [!Ref "AWS::StackName",!Ref serviceName]]
+      VpcId: !ImportValue VPC-ID
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          SourceSecurityGroupId: !ImportValue Public-ALB-ID
+      Tags:
+        - Key: Name
+          Value:  !Join ['-', [!Ref "AWS::StackName", "ECS" ]]
   Cluster:
     Type: AWS::ECS::Cluster
     Properties:
@@ -48,7 +92,7 @@ Resources:
   # Create an ECS Service
   ECSService:
     Type: AWS::ECS::Service
-    DependsOn: LoadBalancer
+    DependsOn: !ImportValue Public-ALB-ID
     Properties:
       ServiceName:  !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'ECSService']]
       Cluster: !Ref Cluster
@@ -67,3 +111,10 @@ Resources:
         - ContainerName: !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'Container']]
           ContainerPort: !Ref servicePort
           TargetGroupArn: !Ref TargetGroup
+
+Outputs:
+  PrivateECS:
+    Description: A reference to the security group for private containers
+    Value: !Ref PrivateECS
+    Export:
+      Name: Private-ECS-SG-ID
