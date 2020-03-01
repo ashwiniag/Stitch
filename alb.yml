@@ -1,0 +1,44 @@
+# Create a LoadBalancer and attach the Security group and Subnets
+Resources:
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      #VpcId: !ImportValue VPC-ID
+      IpAddressType: ipv4
+      Name: !Join ['-', [!Ref "AWS::StackName", "ALB-public"]]
+      Scheme: internet-facing
+      SecurityGroups:
+        - !ImportValue Public-ALB-SG-ID
+      Subnets:
+        - !ImportValue PublicSubnetA
+        - !ImportValue PublicSubnetB
+      Type: application
+
+# Create a TargetGroup for HTTP port 80
+#TargetGroup:
+#  Type: AWS::ElasticLoadBalancingV2::TargetGroup
+#  Properties:
+#    Name: !Join ['-', [!Ref "AWS::StackName", "TargetGroup"]]
+#    Port: 80
+#    Protocol: HTTP
+#    TargetType: ip
+#    VpcId: !ImportValue VPC-ID
+
+# Create a LoadBalancerListener and attach the TargetGroup and LoadBalancer
+  ALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - RedirectConfig:
+            #Host: !Ref DestinationHost
+            Path: "/#{path}"
+            Port: 443
+            Protocol: "HTTPS"
+            Query: "#{query}"
+            StatusCode: HTTP_301
+          Type: redirect
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+#default redirect to port 443
