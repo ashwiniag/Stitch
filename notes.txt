@@ -16,6 +16,12 @@ AWS::StackName: stack name. todo: importance??
 !Sub: substitute function. renders and substitute values within ${} as specified.
 
 [] DependsOn: AttachGateway todo: ??
+
+[] AllocationId: !GetAtt ElasticIPAddress.AllocationId
+AllocationId:  Allocating Fixed IP address... i.e. and elastic IP. Which remains constant irrespective
+!GetAtt: get that elastic IP
+
+
 CLI:
 > aws cloudformation create-stack --stack-name <name>> --template-body file://./<filename>.yml --profile <>
 > aws cloudformation wait stack-create-complete --stack-name <> todo:??
