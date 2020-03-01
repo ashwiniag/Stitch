@@ -15,6 +15,7 @@ AWS::StackName: stack name. todo: importance??
 [] !Sub ${AWS::StackName}-Public-A
 !Sub: substitute function. renders and substitute values within ${} as specified.
 
+[] DependsOn: AttachGateway todo: ??
 CLI:
 > aws cloudformation create-stack --stack-name <name>> --template-body file://./<filename>.yml --profile <>
 > aws cloudformation wait stack-create-complete --stack-name <> todo:??
