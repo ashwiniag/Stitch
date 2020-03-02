@@ -46,18 +46,18 @@ Resources:
       Priority: 1
       ListenerArn: !ImportValue ALB-HTTPS
 
-#  #Create SG for respective fargate service containers
-#  PrivateECS:
-#    Type: AWS::EC2::SecurityGroup
-#    Properties:
-#      GroupDescription:  !Join ['-', [!Ref "AWS::StackName",!Ref serviceName]]
-#      VpcId: !ImportValue VPC-ID
-#      SecurityGroupIngress:
-#        - IpProtocol: -1
-#          SourceSecurityGroupId: !ImportValue Public-ALB-ID
-#      Tags:
-#        - Key: Name
-#          Value:  !Join ['-', [!Ref "AWS::StackName", "ECS" ]]
+  #Create SG for respective fargate service containers
+  PrivateECS:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription:  !Join ['-', [!Ref "AWS::StackName", !Ref serviceName, 'private']]
+      VpcId: !ImportValue VPC-ID
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          SourceSecurityGroupId: !ImportValue Public-ALB-SG-ID
+      Tags:
+        - Key: Name
+          Value:  !Join ['-', [!Ref "AWS::StackName", "ECS" ]]
 #  Cluster:
 #    Type: AWS::ECS::Cluster
 #    Properties:
