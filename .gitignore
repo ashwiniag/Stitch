@@ -1,3 +1,32 @@
 #ignore intellig stash
 *.idea
 
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Scrapy stuff:
+.scrapy
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+
+# Intellij Idea
+.idea/
+# ignore binary archives
+*.zip
+*.tar
+*.tar.gz

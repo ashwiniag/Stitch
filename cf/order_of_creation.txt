@@ -1,0 +1,4 @@
+0 vpc
+1 securitygroup
+2 alb
+3 fargateservices
