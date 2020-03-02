@@ -12,20 +12,19 @@ Parameters:
     Default: Stitch
   GithubBranch:
     Type: String
-    Default: <BRANCH>
+    Default: master
   GithubOAuthToken:
     Type: String
-    Default: <GITHUB ACCESS TOKEN>
+    Default: xxxx
   ContainerPort:
     Type: Number
     Default: 4848
-
 Resources:
   # Create an ECR Repository to store docker images
   ECRRepository:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: !Join ['-', [!Ref Stage, 'ecr-repository']]
+      RepositoryName:  hellostitch1  #!Join ['-', [!Ref Stage, 'ecr-repository']]
   # Create an S3 Bucket to store build artifacts
   S3Bucket:
     Type: AWS::S3::Bucket
@@ -87,13 +86,13 @@ Resources:
         Type: CODEPIPELINE
         # This file buildspec.yml In Source code
         BuildSpec: buildspec.yml
-  # Create CodePipeline with 3 stages (Source, Build and Deploy)
+  #Create CodePipeline with 3 stages (Source, Build and Deploy)
   CodePipeLine:
     Type: AWS::CodePipeline::Pipeline
     DependsOn: S3Bucket
     Properties:
       ArtifactStore:
-        Location: !Join ['-', [!Ref Stage, !Ref 'AWS::AccountId', 's3bucket']]
+        Location: !Join ['-', [!Ref Stage, 's3bucket-artifacts']]
         Type: S3
       Name: !Join ['-', [!Ref Stage, !Ref 'AWS::AccountId', 'CodePipeLine']]
       RestartExecutionOnUpdate: False
@@ -155,7 +154,7 @@ Resources:
                 # Pass parameter values to Fargate-Cluster.yml for deployment
                 ParameterOverrides: !Sub |
                   {
-                    "ImageURI" : { "Fn::GetParam" : ["build-output-artifacts", "imageDetail.json", "ImageURI"] },
+                    "ImageURI" : { "Fn::GetParam" : ["build-output-artifacts", "xx.jar", "ImageURI"] },
                     "Stage":  "${Stage}",
                     "ContainerPort": "${ContainerPort}"
                   }
