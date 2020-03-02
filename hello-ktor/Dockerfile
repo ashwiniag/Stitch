@@ -8,5 +8,5 @@ WORKDIR /stitch
 COPY . /stitch
 
 # Run
-CMD java -jar ./build/libs/hello-ktor-1.0-all.jar
+CMD java -jar ./hello-ktor/build/libs/hello-ktor-1.0-all.jar
 
