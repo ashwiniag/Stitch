@@ -31,96 +31,99 @@ Resources:
       Matcher:
         HttpCode: 200
   # Create a LoadBalancerListener and attach the TargetGroup and LoadBalancer
-  LoadBalancerListener:
+  ALBListenerHTTPSRule:
     Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn: TargetGroup
     Properties:
-      DefaultActions:
-        - TargetGroupArn: !Ref TargetGroup
+      Actions:
           Type: forward
-      LoadBalancerArn: !ImportValue Public-ALB-ID
+          - ForwardConfig:
+            TargetGroupArn: !Ref TargetGroup
       Conditions:
         - Field: path-pattern
           Values:
             - "/"
       Port: 443
-      Protocol: HTTP
-  #Create SG for respective fargate service containers
-  PrivateECS:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription:  !Join ['-', [!Ref "AWS::StackName",!Ref serviceName]]
-      VpcId: !ImportValue VPC-ID
-      SecurityGroupIngress:
-        - IpProtocol: -1
-          SourceSecurityGroupId: !ImportValue Public-ALB-ID
-      Tags:
-        - Key: Name
-          Value:  !Join ['-', [!Ref "AWS::StackName", "ECS" ]]
-  Cluster:
-    Type: AWS::ECS::Cluster
-    Properties:
-      ClusterName: !Join ['-', [!Ref "AWS::StackName",!Ref serviceName]]
-  # Create Access Role for ECS-Tasks
-  ExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName:  !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'ExecutionRole']]
-      AssumeRolePolicyDocument:
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: ecs-tasks.amazonaws.com
-            Action: 'sts:AssumeRole'
-      ManagedPolicyArns:
-        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
-  # Create a TaskDefinition with container details
-  TaskDefinition:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      Memory: 1024
-      Cpu: 512
-      NetworkMode: awsvpc
-      RequiresCompatibilities:
-        - 'FARGATE'
-      TaskRoleArn: !Ref ExecutionRole
-      ExecutionRoleArn: !Ref ExecutionRole
-      ContainerDefinitions:
-        - Name:  !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'Container']]
-          Image: !Ref ImageURI
-          PortMappings:
-            - ContainerPort: !Ref servicePort
-              HostPort: !Ref servicePort
-  # Create an ECS Service
-  ECSService:
-    Type: AWS::ECS::Service
-    DependsOn: LoadBalancerListener
-    Properties:
-      ServiceName:  !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'ECSService']]
-      Cluster: !Ref Cluster
-      TaskDefinition: !Ref TaskDefinition
-      DesiredCount: 2
-      LaunchType: FARGATE
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
-          Subnets:
-            - !ImportValue PublicSubnetA
-            - !ImportValue PublicSubnetB
-          SecurityGroups:
-            - !Ref PrivateECS
-      LoadBalancers:
-        - ContainerName: !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'Container']]
-          ContainerPort: !Ref servicePort
-          TargetGroupArn: !Ref TargetGroup
-
-Outputs:
-  PrivateECS:
-    Description: A reference to the security group for private containers
-    Value: !Ref PrivateECS
-    Export:
-      Name: Private-ECS-SG-ID
-  TargetGroup:
-    Description: A reference to the Target group for private containers
-    Value: !Ref TargetGroup
-    Export:
-      Name: TG-ID
+      Protocol: HTTPS
+      LoadBalancerArn: !ImportValue Public-ALB-ID
+      ListenerArn: !ImportValue ALBListenerHTTPS
+#  #Create SG for respective fargate service containers
+#  PrivateECS:
+#    Type: AWS::EC2::SecurityGroup
+#    Properties:
+#      GroupDescription:  !Join ['-', [!Ref "AWS::StackName",!Ref serviceName]]
+#      VpcId: !ImportValue VPC-ID
+#      SecurityGroupIngress:
+#        - IpProtocol: -1
+#          SourceSecurityGroupId: !ImportValue Public-ALB-ID
+#      Tags:
+#        - Key: Name
+#          Value:  !Join ['-', [!Ref "AWS::StackName", "ECS" ]]
+#  Cluster:
+#    Type: AWS::ECS::Cluster
+#    Properties:
+#      ClusterName: !Join ['-', [!Ref "AWS::StackName",!Ref serviceName]]
+#  # Create Access Role for ECS-Tasks
+#  ExecutionRole:
+#    Type: AWS::IAM::Role
+#    Properties:
+#      RoleName:  !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'ExecutionRole']]
+#      AssumeRolePolicyDocument:
+#        Statement:
+#          - Effect: Allow
+#            Principal:
+#              Service: ecs-tasks.amazonaws.com
+#            Action: 'sts:AssumeRole'
+#      ManagedPolicyArns:
+#        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+#  # Create a TaskDefinition with container details
+#  TaskDefinition:
+#    Type: AWS::ECS::TaskDefinition
+#    Properties:
+#      Memory: 1024
+#      Cpu: 512
+#      NetworkMode: awsvpc
+#      RequiresCompatibilities:
+#        - 'FARGATE'
+#      TaskRoleArn: !Ref ExecutionRole
+#      ExecutionRoleArn: !Ref ExecutionRole
+#      ContainerDefinitions:
+#        - Name:  !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'Container']]
+#          Image: !Ref ImageURI
+#          PortMappings:
+#            - ContainerPort: !Ref servicePort
+#              HostPort: !Ref servicePort
+#  # Create an ECS Service
+#  ECSService:
+#    Type: AWS::ECS::Service
+#    DependsOn: LoadBalancerListener
+#    Properties:
+#      ServiceName:  !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'ECSService']]
+#      Cluster: !Ref Cluster
+#      TaskDefinition: !Ref TaskDefinition
+#      DesiredCount: 2
+#      LaunchType: FARGATE
+#      NetworkConfiguration:
+#        AwsvpcConfiguration:
+#          AssignPublicIp: ENABLED
+#          Subnets:
+#            - !ImportValue PublicSubnetA
+#            - !ImportValue PublicSubnetB
+#          SecurityGroups:
+#            - !Ref PrivateECS
+#      LoadBalancers:
+#        - ContainerName: !Join ['-', [!Ref "AWS::StackName",!Ref serviceName, 'Container']]
+#          ContainerPort: !Ref servicePort
+#          TargetGroupArn: !Ref TargetGroup
+#
+#Outputs:
+#  PrivateECS:
+#    Description: A reference to the security group for private containers
+#    Value: !Ref PrivateECS
+#    Export:
+#      Name: Private-ECS-SG-ID
+#  TargetGroup:
+#    Description: A reference to the Target group for private containers
+#    Value: !Ref TargetGroup
+#    Export:
+#      Name: TG-ID
