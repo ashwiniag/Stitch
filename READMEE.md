@@ -18,5 +18,6 @@ ToDO:
 [] For CICD deployment store commit sha and its details to have every details.
 [] Fargate deployement based on tag.
 [] Monitoring??
-  
-
+[] Restructure the folder structure
+[] shellscript to populate folder structure according to requirements and easy use of CF CLI 
+[]
