@@ -15,7 +15,7 @@ Parameters:
     Default: master
   GithubOAuthToken:
     Type: String
-    Default: xxxx
+    Default:
   ContainerPort:
     Type: Number
     Default: 4848
@@ -72,7 +72,7 @@ Resources:
       Artifacts:
         Type: CODEPIPELINE
       Environment:
-        ComputeType: BUILD_GENERAL1_SMALL
+        ComputeType: BUILD_GENERAL1_MEDIUM
         Image: aws/codebuild/standard:2.0
         ImagePullCredentialsType: CODEBUILD
         PrivilegedMode: True
