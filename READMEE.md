@@ -1,8 +1,11 @@
+Stitch
+An attempt to deploy services in fargate and adapt CI/CD flow.
 Agenda: To learn Cloudformation, AWS resources, architecture setup, CI/CD flow, microservices test cases
 and to jot down entire picture in books and blogs.
 
-Infrastructure setup
-USed: cloudformation 
+# Infrastructure setup
+
+Used: cloudformation 
 *vpc.yml*
 - Private VPC for hosting of aws services, microservices, dbinstances.
 - It creates 2 public subnets and 2 private subnets. 
@@ -18,6 +21,7 @@ Note:
 *securitygroup*
 - Dedicated security group for each service that palys part in hosting services. 
 - This layer just creates security group for only alb and other such services which are launched once and are not touched for good time. 
+
 *alb.yml*
 - I have a Public ALB. It listens on two ports 
 a. 80 port: which is by default redirected to 443. (http request --https)
@@ -26,6 +30,7 @@ here apply certificate..ssl/tls
 I have created dedicated alb.yml file because we dont often play much with alb. And its one time creation. 
 All other applications will be running behind ALB to communicate with the world.
 - Attaches security group created in previous layer. 
+
 *fargateservices.yml*
 YEs I agree naming convention can be lot better and folder structure. I kinda little ran out of time.
 This layer will create:
@@ -37,29 +42,26 @@ Why I have created these AWS resources here? lets say I have created HAllo-World
 which are important and are required, tomorrow when I delete them...I dont want these resources dangling around like nomads.
 HEnce Respective service will be deleted along with their colleagues. Easy to maintain.
 
-hello-ktor:
+*hello-ktor*
 Soon enough Ill be updating this folder structure for easy maintainence and deployment.
 At present its just web app displaying hello world !
 
-Dockerfile:
+*Dockerfile*
 Simple comands just to dockerize webapplication
 
-shellscript:
+*shellscript*
 In general there are three stages involved 
 a. build the application locally run respective test cases
 b. dockerize it using docker file and renaming docker images based on snvironment
 c. normal health check after starting containers from created docker images.
 Yeah can come up with more insights or ideas too:)
 
-CICD:
+# CICD:
 As beginner I have used Codebuild and codepipleine...at first to understand the flow and get an idea.
 FLow is simple: 
---> githb --> codepipline (take the latest commit)--> codebuild (runs shellscript)--> build artifact and store in S3, also
-build docker image and stores in ECR repo--> dump 
-
+*--> githb --> codepipline (take the latest commit)--> codebuild (runs shellscript)--> build artifact and store in S3, also
+build docker image and stores in ECR repo--> dump* 
 well it understands what to do is from YML file
-
-CI/CD
 
 AWS resources used.
 - ECR Repository: To store docker image and deploying into ECS fargate
@@ -70,8 +72,8 @@ AWS resources used.
 - AWS Codebuild
 - AWS CodePipeline
 
-ToDO:
-Alert! Sanitization needed
+#ToDO:
+Alert! Sanitization needed and Lots TODO.
 [] Make it parameterised for creation of AWS resources for different environments
 [] More roubust and better choice of nomenclature
 [] For CICD deployment store commit sha and its details to have every details.
