@@ -76,13 +76,21 @@ AWS resources used.
 - git clone
 - Use Cloudformation CLI to create and play around. **AWS::StackName** value i.e stack name is used as basic distinction
 
-#ToDO:
-Alert! Sanitization needed and Lots TODO.
+**#ToDO:
+Alert! Sanitization needed and Lots TODO.**
+
 [] Make it parameterised for creation of AWS resources for different environments
+
 [] More roubust and better choice of nomenclature
+
 [] For CICD deployment store commit sha and its details to have every details.
+
 [] Fargate deployement based on tag.
+
 [] Monitoring??
+
 [] Restructure the folder structure
+
 [] shellscript to populate folder structure according to requirements and easy use of CF CLI 
+
 [] an order of creation of AWs resources and more controlled thought.
