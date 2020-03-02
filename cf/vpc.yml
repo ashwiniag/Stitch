@@ -1,0 +1,154 @@
+# To create VPC
+AWSTemplateFormatVersion: 2010-09-09
+Description: Setting up VPC to deploy AWS services, microservices in private network.
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 172.10.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value:  !Join ['', [!Ref "AWS::StackName", "-VPC" ]]
+  # Create IGW for VPC:
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    DependsOn: VPC
+  # Attach IGW:
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+  # Public Subnets AZ- a and b respectively
+  PublicSubnetA: #localscope A for AZ-ap-south-1a
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 172.10.1.0/24
+      AvailabilityZone: !Select [ 0, !GetAZs ]
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-Public-A
+  PublicSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 172.10.2.0/24
+      AvailabilityZone: !Select [ 1, !GetAZs ]
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-Public-B
+  #Private Subnets in AZ - a and b respectively
+  PrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 172.10.3.0/24
+      AvailabilityZone: !Select [ 0, !GetAZs ]
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-Private-A
+  PrivateSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 172.10.4.0/24
+      AvailabilityZone: !Select [ 1, !GetAZs ]
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-Private-B
+  # First create Public route tables for public subnets:
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: Public
+  # Route entry in Route table created.
+  PublicRoute1:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  #  Private Route table:
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: Private
+  # Route Entry for private route table
+  PrivateRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      # Route traffic through the NAT Gateway for application running in private subnets
+      NatGatewayId: !Ref NATGateway
+  # NAT Gateway:
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt ElasticIPAddress.AllocationId
+      SubnetId: !Ref PublicSubnetA
+      Tags:
+        - Key: Name
+          Value: !Sub NAT-${AWS::StackName}
+  ElasticIPAddress:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: VPC
+  # Attach Route tables to respective subnets
+  PublicSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetA
+      RouteTableId: !Ref PublicRouteTable
+  PublicSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetB
+      RouteTableId: !Ref PublicRouteTable
+  PrivateSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnetA
+      RouteTableId: !Ref PrivateRouteTable
+  PrivateSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnetB
+      RouteTableId: !Ref PrivateRouteTable
+
+Outputs:
+  VPC:
+    Description: VPC of the base network
+    Value: !Ref VPC
+    Export:
+       Name: VPC-ID
+  PublicSubnetA:
+    Description: First Public Subnet
+    Value: !Ref PublicSubnetA
+    Export:
+      Name: PublicSubnetA
+  PublicSubnetB:
+    Description: Second Public Subnet
+    Value: !Ref PublicSubnetB
+    Export:
+      Name: PublicSubnetB
+  PrivateSubnetA:
+    Description: First Private Subnet
+    Value: !Ref PrivateSubnetA
+    Export:
+      Name: PrivateSubnetA
+  PrivateSubnetB:
+    Description: Second Private Subnet
+    Value: !Ref PrivateSubnetB
+    Export:
+      Name: PrivateSubnetB

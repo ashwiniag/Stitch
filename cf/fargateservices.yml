@@ -11,7 +11,7 @@ Parameters:
   ImageURI:
     Type: String
     Default: 575551386784.dkr.ecr.ap-south-1.amazonaws.com/hellostitch:latest
-
+# TODO: deploy based on Image tag
 Resources:
   #Create Targate group for respective service
   TargetGroup:
