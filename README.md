@@ -32,12 +32,12 @@ All other applications will be running behind ALB to communicate with the world.
 - Attaches security group created in previous layer. 
 
 *fargateservices.yml*
-YEs I agree naming convention can be lot better and folder structure. I kinda little ran out of time.
-This layer will create:
+- Yes I agree naming convention can be lot better and folder structure. I kinda little ran out of time.
+- This layer will create:
 a. An alb target group (objects)
 b. dedicated security group
 c. Fargate: cluster, services, container definition, roles and their attachment. Rolling update.
-This topic is preety huge an interesting. Soon will be posting blog posts on it.
+- his topic is pretty interesting. Soon will be posting blog posts on it.
 Why I have created these AWS resources here? lets say I have created HAllo-World service its neccessary resources 
 which are important and are required, tomorrow when I delete them...I dont want these resources dangling around like nomads.
 HEnce Respective service will be deleted along with their colleagues. Easy to maintain.
