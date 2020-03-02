@@ -23,7 +23,6 @@ phases:
       - echo Build completed on `date`
       - echo Pushing the Docker images...
       - docker push $ECR_REPOSITORY_URI:$IMAGE_TAG
-      - printf '{"ImageURI":"%s:%s"}' $ECR_REPOSITORY_URI $IMAGE_TAG > xx.jar
 artifacts:
   # - the CodeBuild job uploads a single zip archive
   files:
