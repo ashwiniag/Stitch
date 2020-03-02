@@ -1,0 +1,61 @@
+# Create a LoadBalancer and attach the Security group and Subnets
+Resources:
+  TargetGroupDefault:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Join ['-', [!Ref "AWS::StackName", "dev-null"]]
+      Port: 443
+      Protocol: HTTPS
+      TargetType: ip
+      VpcId: !ImportValue VPC-ID
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      #VpcId: !ImportValue VPC-ID
+      IpAddressType: ipv4
+      Name: !Join ['-', [!Ref "AWS::StackName", "ALB-public"]]
+      Scheme: internet-facing
+      SecurityGroups:
+        - !ImportValue Public-ALB-SG-ID
+      Subnets:
+        - !ImportValue PublicSubnetA
+        - !ImportValue PublicSubnetB
+      Type: application
+  ALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - RedirectConfig:
+            Host: "#{host}"
+            Path: "/#{path}"
+            Port: 443
+            Protocol: "HTTPS"
+            Query: "#{query}"
+            StatusCode: HTTP_301
+          Type: redirect
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+  ALBListenerHTTPS:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn:  arn:aws:acm:ap-south-1:575551386784:certificate/67dcaa05-db60-49fa-be99-15201c469fdd  # create
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroupDefault
+Outputs:
+  LoadBalancer:
+    Description: A reference to the security group for load balancers
+    Value: !Ref LoadBalancer
+    Export:
+      Name: Public-ALB-ID
+  ALBListenerHTTPS:
+    Description: path-based routing
+    Value: !Ref ALBListenerHTTPS
+    Export:
+      Name: ALB-HTTPS
