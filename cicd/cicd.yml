@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description:  CodePipeline.
+Parameters:
+  Stage:
+    Type: String
+    Default: proto
+  GithubUserName:
+    Type: String
+    Default: <USERNAME>
+  GithubRepo:
+    Type: String
+    Default: Stitch
+  GithubBranch:
+    Type: String
+    Default: <BRANCH>
+  GithubOAuthToken:
+    Type: String
+    Default: <GITHUB ACCESS TOKEN>
+  ContainerPort:
+    Type: Number
+    Default: 4848
+
+Resources:
+  # Create an ECR Repository to store docker images
+  ECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Join ['-', [!Ref Stage, 'ecr-repository']]
+  # Create an S3 Bucket to store build artifacts
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Join ['-', [!Ref Stage, 's3bucket-artifacts']]
