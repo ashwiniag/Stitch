@@ -6,7 +6,7 @@ and to jot down entire picture in books and blogs.
 # Infrastructure setup
 
 Used: cloudformation 
-*vpc.yml*
+**vpc.yml**
 - Private VPC for hosting of aws services, microservices, dbinstances.
 - It creates 2 public subnets and 2 private subnets. 
 Imp!:: Have a dedicated NAt gateways for each private subnets.
@@ -18,11 +18,11 @@ Imp!:: Have a dedicated NAt gateways for each private subnets.
 Note: 
 - For better subnet understanding and its calculation refer http://www.davidc.net/sites/default/subnets/subnets.html?network=10.0.0.0&mask=19&division=1.0
 
-*securitygroup*
+**securitygroup**
 - Dedicated security group for each service that palys part in hosting services. 
 - This layer just creates security group for only alb and other such services which are launched once and are not touched for good time. 
 
-*alb.yml*
+**alb.yml**
 - I have a Public ALB. It listens on two ports 
 a. 80 port: which is by default redirected to 443. (http request --https)
 b. 443 port: where an option to attach multiple listener rules at this port for conditioned based request routing 
@@ -31,7 +31,7 @@ I have created dedicated alb.yml file because we dont often play much with alb. 
 All other applications will be running behind ALB to communicate with the world.
 - Attaches security group created in previous layer. 
 
-*fargateservices.yml*
+**fargateservices.yml**
 - Yes I agree naming convention can be lot better and folder structure. I kinda little ran out of time.
 - This layer will create:
 a. An alb target group (objects)
@@ -42,14 +42,14 @@ Why I have created these AWS resources here? lets say I have created HAllo-World
 which are important and are required, tomorrow when I delete them...I dont want these resources dangling around like nomads.
 HEnce Respective service will be deleted along with their colleagues. Easy to maintain.
 
-*hello-ktor*
+**hello-ktor**
 Soon enough Ill be updating this folder structure for easy maintainence and deployment.
 At present its just web app displaying hello world !
 
-*Dockerfile*
+**Dockerfile**
 Simple comands just to dockerize webapplication
 
-*shellscript*
+**shellscrip*t*
 In general there are three stages involved 
 a. build the application locally run respective test cases
 b. dockerize it using docker file and renaming docker images based on snvironment
@@ -71,6 +71,10 @@ AWS resources used.
 - IAM Role for Cloudformation Execution
 - AWS Codebuild
 - AWS CodePipeline
+
+# USE:
+- git clone
+- Use Cloudformation CLI to create and play around. **AWS::StackName** value i.e stack name is used as basic distinction
 
 #ToDO:
 Alert! Sanitization needed and Lots TODO.
