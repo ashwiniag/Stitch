@@ -1,32 +1,36 @@
-#ignore intellig stash
-*.idea
-
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Scrapy stuff:
-.scrapy
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-
-# Intellij Idea
-.idea/
-# ignore binary archives
+.DS_Store
+.idea/shelf
+/android.tests.dependencies
+/confluence/target
+/dependencies
+/dist
+/gh-pages
+/ideaSDK
+/android-studio/sdk
+.vscode
+out
+tmp
+workspace.xml
+*.versionsBackup
+/idea/testData/debugger/tinyApp/classes*
+/jps-plugin/testData/kannotator
+.*.swp
+.idea
+/build
+/classes
+/lib
+.gradle
+*.iml
+*.iws
+*.ipr
+pyenv
+buildSrc/.gradle
+buildSrc/build
+buildSrc/src/main/resources
+gradle.properties
+native-libs
+docker_env_vars.txt
+*.pem
 *.zip
-*.tar
 *.tar.gz
+ecr_login_pass.txt
