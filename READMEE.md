@@ -1,5 +1,6 @@
 
 Infrastructure setup
+- VPC 
 
 CI/CD
 
@@ -13,6 +14,7 @@ AWS resources used.
 - AWS CodePipeline
 
 ToDO:
+Alert! Sanitization needed
 [] Make it parameterised for creation of AWS resources for different environments
 [] More roubust and better choice of nomenclature
 [] For CICD deployment store commit sha and its details to have every details.
@@ -20,4 +22,4 @@ ToDO:
 [] Monitoring??
 [] Restructure the folder structure
 [] shellscript to populate folder structure according to requirements and easy use of CF CLI 
-[]
+
